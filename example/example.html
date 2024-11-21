@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<title>WebBinding (Skia application written in C++ compiled to Web Assembly)</title>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  canvas, img {
+    border: 1px dashed #AAA;
+  }
+</style>
+
+<canvas id=canvasToDrawOn width=816 height=464></canvas>
+
+<script type="text/javascript" src="./example.js"></script>
+
+<script type="text/javascript" charset="utf-8" async>
+
+  // load the bindings then call main
+  loadSkiaWebBind.then((bindings) => {
+      bindings._main();
+  });
+
+</script>
