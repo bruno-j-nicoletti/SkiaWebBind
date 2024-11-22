@@ -32,7 +32,7 @@ endif()
 
 
 add_compile_options(-fwasm-exceptions)
-add_compile_options(-pthread)
+#add_compile_options(-pthread)
 add_compile_options(-DSK_FORCE_8_BYTE_ALIGNMENT)
 add_compile_options(-DSK_DISABLE_LEGACY_PARAGRAPH_UNICODE=1)
 add_compile_options(-DSK_RELEASE)
@@ -89,6 +89,7 @@ set(SKIA_WEB_BIND_LINK_OPTIONS
   "SHELL:--pre-js ${SKIA_WEB_BIND_ROOT_DIR}/JS/preamble.js"
   "SHELL:--pre-js ${SKIA_WEB_BIND_ROOT_DIR}/JS/interface.js"
   "SHELL:--pre-js ${SKIA_WEB_BIND_ROOT_DIR}/JS/postamble.js"
+   #"SHELL:--post-js ${SKIA_WEB_BIND_ROOT_DIR}/JS/debugging.js"
   "SHELL:--extern-post-js ${SKIA_WEB_BIND_ROOT_DIR}/JS/loadSkiaWebBind.js"
   --bind
   -Wl,--whole-archive
@@ -103,7 +104,7 @@ set(SKIA_WEB_BIND_LINK_OPTIONS
   -sWASM=1
   -sINVOKE_RUN=0
   -sIGNORE_MISSING_MAIN=0
-  -sDYNAMIC_EXECUTION=0
+  -sDYNAMIC_EXECUTION=1
   -sDISABLE_EXCEPTION_CATCHING
   -sNODEJS_CATCH_EXIT=0
   -fno-rtti

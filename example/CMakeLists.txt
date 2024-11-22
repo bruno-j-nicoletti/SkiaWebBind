@@ -5,12 +5,15 @@ add_executable(Example
 
 target_include_directories(Example
   PUBLIC
-  include
   ${SKIA_ROOT_DIR}
 )
 
 target_link_options(Example
   PUBLIC
+  -O3
+  --closure=1
+  --closure-args=--externs=${SKIA_WEB_BIND_ROOT_DIR}/JS/externs.js
+  -sFILESYSTEM=0
   ${SKIA_WEB_BIND_LINK_OPTIONS}
   -sEXPORTED_FUNCTIONS=[_main,_malloc,_free]
 )

@@ -98,12 +98,7 @@ namespace emscripten {
 
 EMSCRIPTEN_BINDINGS(SkiaWebBinds)
 {
-  static bool bound = false;
-  if (bound) {
-    return;
-  }
-  bound = true;
-
+  std::cout << "BINDING!\n";
   constant("gpu", true);
 
   class_<GrDirectContext>("GrDirectContext").smart_ptr<sk_sp<GrDirectContext>>("sk_sp<GrDirectContext>");
