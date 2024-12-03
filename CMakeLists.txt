@@ -97,7 +97,7 @@ set(SKIA_WEB_BIND_LINK_OPTIONS
   -sALLOW_MEMORY_GROWTH
   ${SKIA_WEB_BIND_BINARY_DIR}/libSkiaWebBind.a
   -Wl,--no-whole-archive
-  ${SKIA_ROOT_DIR}/out/skiawebbinding_wasm/libskia.a
+  ${SKIA_WEB_BIND_BINARY_DIR}/libskia.a
   -sMODULARIZE
   -sUSE_WEBGL2=1
   -sMAX_WEBGL_VERSION=2
