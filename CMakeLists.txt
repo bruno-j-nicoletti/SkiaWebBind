@@ -114,6 +114,8 @@ set(SKIA_WEB_BIND_LINK_OPTIONS
   -sASSERTIONS=0
   --no-entry
   -sEXIT_RUNTIME
+  #-pthread
+  #-sPROXY_TO_PTHREAD
   -lembind
   -lGL
 )
