@@ -182,13 +182,45 @@ WASM_GN_ARGS = """
     """
 
 
-def patchLines(path : Path, patchFunc : Callable[[Any, str], None]) -> None :
+def patchLines(path : Path, patchFunc : Callable[[str], str|None]) -> None :
     with open(path, "r") as file:
         lines = file.readlines()
 
     with open(path, "w") as file:
         for line in lines:
-            patchFunc(file, line)
+            patchedLine = patchFunc(line)
+            if patchedLine is not None :
+                file.write(patchedLine)
+
+
+compilerLinesToPatch = [
+    (
+        'cc = "$skia_emsdk_dir/upstream/emscripten/emcc"',
+        'cc = "$skia_emsdk_dir/upstream/emscripten/emccARGS"\n'
+    ),
+    (
+        'cxx = "$skia_emsdk_dir/upstream/emscripten/em++"',
+        'cxx = "$skia_emsdk_dir/upstream/emscripten/em++ARGS"\n'
+    ),
+    (
+        'cc = "$skia_emsdk_dir/upstream/emscripten/emcc.bat"',
+        'cc = "$skia_emsdk_dir/upstream/emscripten/emcc.batARGS"\n',
+    ),
+    (
+        'cxx = "$skia_emsdk_dir/upstream/emscripten/em++.bat"',
+        'cxx = "$skia_emsdk_dir/upstream/emscripten/em++.batARGS"\n',
+    )
+]
+
+def patchCompilerArgs(compilerArgs : str) -> None :
+    if len(compilerArgs) > 0 :
+        compilerArgs = " " + compilerArgs
+        def patcher(line : str) -> str :
+            for find, replace in compilerLinesToPatch:
+                if line.strip() == find:
+                    return replace.replace("ARGS", compilerArgs)
+            return line
+        patchLines(SKIA_SRC_DIR / "gn" / "toolchain" / "BUILD.gn", patcher)
 
 
 class SkiaBuildScript:
@@ -196,6 +228,7 @@ class SkiaBuildScript:
         self.config = "Release"
         self.branch = None
         self.platform = "wasm"
+        self.compilerArgs = ""
 
     def parse_arguments(self):
         parser = argparse.ArgumentParser(description="Build Skia for WebAssembly")
@@ -203,12 +236,14 @@ class SkiaBuildScript:
         parser.add_argument("-branch", help="Skia Git branch to checkout", default="main")
         parser.add_argument("-emsdk", help="Optional path to the emsdk to use, defaults to skia's default.", default=None)
         parser.add_argument("--shallow", action="store_true", help="Perform a shallow clone of the Skia repository")
+        parser.add_argument("--pthread", action="store_true", help="Compile to wasm with '-pthread'")
         args = parser.parse_args()
-
 
         self.emsdk = args.emsdk
         self.branch = args.branch
         self.shallow_clone = args.shallow
+        if args.pthread :
+            self.compilerArgs = '-pthread'
 
     def generate_gn_args(self) :
         output_dir = TMP_DIR / f"{self.platform}_{self.config}"
@@ -314,6 +349,7 @@ class SkiaBuildScript:
             os.chdir(SKIA_SRC_DIR)
             colored_print("Syncing Deps...", Colors.OKBLUE)
             subprocess.run(["python3", "tools/git-sync-deps"], check=True)
+            patchCompilerArgs(self.compilerArgs)
         else:
             os.chdir(SKIA_SRC_DIR)
             fetch_command = ["git", "fetch"]
@@ -323,6 +359,7 @@ class SkiaBuildScript:
             subprocess.run(fetch_command, check=True)
             subprocess.run(["git", "checkout", self.branch], check=True)
             subprocess.run(["git", "reset", "--hard", f"origin/{self.branch}"], check=True)
+            patchCompilerArgs(self.compilerArgs)
 
         # patch here
         colored_print("Skia repository setup complete.", Colors.OKGREEN)
@@ -349,6 +386,7 @@ class SkiaBuildScript:
         colored_print(f"GN args summary written to {summary_file}", Colors.OKGREEN)
 
     def run(self):
+
         self.parse_arguments()
         self.setup_skia_repo()
         self.generate_gn_args()
@@ -358,9 +396,7 @@ class SkiaBuildScript:
 
         self.write_gn_args_summary()
 
-        colored_print(f"Build completed successfully for {self.platform} {self.config}", Colors.OKGREEN)
-
-        colored_print(f"Build completed successfully for {self.platform} {self.config} ", Colors.OKGREEN)
+        colored_print(f"Build completed successfully for ", Colors.OKGREEN)
 
 if __name__ == "__main__":
     SkiaBuildScript().run()
