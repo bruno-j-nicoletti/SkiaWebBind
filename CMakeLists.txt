@@ -2,23 +2,19 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 project(SkiaWebBind VERSION 0.1)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
+
 IF (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
   message(FATAL_ERROR "SkiaWebBind need to be compiled with emscripten to WASM, currently building to ${CMAKE_SYSTEM_NAME}.")
 endif()
 
-if (NOT DEFINED SKIA_ROOT_DIR)
-  message(FATAL_ERROR "Need set SKIA_ROOT_DIR to point to the directory with the skia checkout.")
-endif()
-
 set(SKIA_WEB_BIND_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(SKIA_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/skia")
 set(SKIA_WEB_BIND_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
-set(CMAKE_EXPORT_COMPILE_COMMANDS YES)
-set(CMAKE_FIND_PACKAGE_REDIRECTS_DIR ${CMAKE_BINARY_DIR})
 
 message(${PROJECT_NAME} ": compiler id is " ${CMAKE_CXX_COMPILER_ID} " VERSION IS " ${CMAKE_CXX_COMPILER_VERSION})
 
@@ -29,7 +25,6 @@ if(CCACHE_PROGRAM)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
   message("Enabled compiler caching")
 endif()
-
 
 add_compile_options(-fwasm-exceptions)
 add_compile_options(-pthread)

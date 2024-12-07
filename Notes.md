@@ -4,6 +4,7 @@
     - hide as much as possible of the html/js gubbins from the client C++ code
 
 ## Next Steps
+- rtti shenanigans
 - integrate building skia into cmake
     - tidy up linking args
 - figure out event loops so updates happen
