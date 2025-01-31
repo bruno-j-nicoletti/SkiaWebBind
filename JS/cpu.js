@@ -53,6 +53,7 @@
             }
             surface.isSoftware = true;
             surface.isWebGL = false;
+            console.log("Skia Web Binding : Made software surface");
             return surface;
         };
 

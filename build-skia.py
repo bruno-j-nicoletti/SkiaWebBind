@@ -62,13 +62,11 @@ def colored_print(message, color):
 # Shared constants
 SKIA_GIT_URL = "https://github.com/google/skia.git"
 
-
 ROOT_DIR = Path(__file__).resolve().parent
 BUILD_DIR = Path(__file__).resolve().parent / "build"
 SRC_DIR = ROOT_DIR / "thirdparty"
 SKIA_SRC_DIR = SRC_DIR / "skia"
 TMP_DIR = BUILD_DIR / "tmp" / "skia"
-ACTIVATE_EMSDK_PATH = SKIA_SRC_DIR / "bin" / "activate-emsdk"
 
 # Platform-specific constants
 MAC_MIN_VERSION = "10.15"
@@ -225,6 +223,10 @@ def patchCompilerArgs(compilerArgs : str) -> None :
 
 class SkiaBuildScript:
     def __init__(self):
+        self.emsdk = os.environ.get('EMSDK')
+        if self.emsdk is None :
+            print("You need to have EMSDK environment variable set by activating an emscripten SDK")
+            exit(1)
         self.config = "Release"
         self.branch = None
         self.platform = "wasm"
@@ -232,14 +234,12 @@ class SkiaBuildScript:
 
     def parse_arguments(self):
         parser = argparse.ArgumentParser(description="Build Skia for WebAssembly")
-        parser.add_argument("-config", choices=["Debug", "Release"], default="Release", help="Build configuration")
-        parser.add_argument("-branch", help="Skia Git branch to checkout", default="main")
-        parser.add_argument("-emsdk", help="Optional path to the emsdk to use, defaults to skia's default.", default=None)
+        parser.add_argument("--config", choices=["Debug", "Release"], default="Release", help="Build configuration")
+        parser.add_argument("--branch", help="Skia Git branch to checkout", default="main")
         parser.add_argument("--shallow", action="store_true", help="Perform a shallow clone of the Skia repository")
         parser.add_argument("--pthread", action="store_true", help="Compile to wasm with '-pthread'")
         args = parser.parse_args()
 
-        self.emsdk = args.emsdk
         self.branch = args.branch
         self.shallow_clone = args.shallow
         if args.pthread :

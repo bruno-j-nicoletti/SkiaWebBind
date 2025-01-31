@@ -4,6 +4,9 @@ release :
 	emcmake cmake -GNinja -B build .
 	cd build; ninja
 
+.PHONY : skia
+skia :
+	./build-skia.py --pthread --shallow
 
 .PHONE: clean
 clean:

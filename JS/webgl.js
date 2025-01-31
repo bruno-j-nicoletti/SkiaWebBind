@@ -140,6 +140,9 @@
 
                 surface = theModule.MakeSWSurface(newCanvas);
             }
+            else {
+                console.log("Skia Web Binding : Made WebGL surface");
+            }
             return surface;
         };
 
