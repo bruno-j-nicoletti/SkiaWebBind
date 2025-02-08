@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 project(SkiaWebBind VERSION 0.1)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
@@ -56,17 +56,16 @@ add_compile_options(-ffp-contract=off)
 add_compile_options(-fstrict-aliasing)
 add_compile_options(-fPIC)
 add_compile_options(-fvisibility=hidden)
-add_compile_options(-O3)
-add_compile_options(-std=c++17)
+#add_compile_options(-g)
+add_compile_options(-std=c++26)
 add_compile_options(-fvisibility-inlines-hidden)
+add_compile_options(-fdebug-compilation-dir=${CMAKE_CURRENT_SOURCE_DIR})
 #add_compile_options(-fno-exceptions)
 add_compile_options(-DEMSCRIPTEN_HAS_UNBOUND_TYPE_NAMES=0)
 add_compile_options(-fno-rtti)
 
 add_library(SkiaWebBind STATIC
-  "src/swbJSModule.cpp"
-  "src/swbSkiaLogo.cpp"
-  "src/swbSurface.cpp")
+  "src/swbWebSurface.cpp")
 
 target_include_directories(SkiaWebBind
   PUBLIC
@@ -74,7 +73,8 @@ target_include_directories(SkiaWebBind
   ${SKIA_ROOT_DIR}
 )
 
-set(SKIA_WEB_BIND_JS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/JS/cpu.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/debug.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/externs.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/interface.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/loadSkiaWebBind.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/postamble.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/preamble.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/release.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/webgl.js)
+set(SKIA_WEB_BIND_JS_SOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/JS/cpu.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/debug.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/externs.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/interface.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/loadSkiaWebBind.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/postamble.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/preamble.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/release.js;${CMAKE_CURRENT_SOURCE_DIR}/JS/webgl.js)
 
 # add this to link options to client targets to generate appropriate .js and .wasm
 set(SKIA_WEB_BIND_LINK_OPTIONS
@@ -113,4 +113,5 @@ set(SKIA_WEB_BIND_LINK_OPTIONS
   -lGL
 )
 
+add_subdirectory(RawGL)
 add_subdirectory(example)

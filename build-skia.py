@@ -78,7 +78,7 @@ USE_LIBGRAPHEME = False  # Set to True to use libgrapheme instead of ICU
 # Shared libraries
 LIBS = [
         "libskia.a", "libskottie.a", "libskshaper.a", "libsksg.a",
-        "libskparagraph.a", "libsvg.a", "libskunicode_core.a",
+        "libskparagraph.a", "libskunicode_core.a",
         "libskunicode_libgrapheme.a" if USE_LIBGRAPHEME else "libskunicode_icu.a"
     ]
 
@@ -227,7 +227,7 @@ class SkiaBuildScript:
         if self.emsdk is None :
             print("You need to have EMSDK environment variable set by activating an emscripten SDK")
             exit(1)
-        self.config = "Release"
+        self.config = "Debug"
         self.branch = None
         self.platform = "wasm"
         self.compilerArgs = ""
@@ -238,8 +238,9 @@ class SkiaBuildScript:
         parser.add_argument("--branch", help="Skia Git branch to checkout", default="main")
         parser.add_argument("--shallow", action="store_true", help="Perform a shallow clone of the Skia repository")
         parser.add_argument("--pthread", action="store_true", help="Compile to wasm with '-pthread'")
+        parser.add_argument("-d", "--dirtyskia", action="store_true", help="The skia checkout has been edited, so don't overwrite it with a clean checkout.")
         args = parser.parse_args()
-
+        self.commandLineArgs = args
         self.branch = args.branch
         self.shallow_clone = args.shallow
         if args.pthread :
@@ -350,16 +351,18 @@ class SkiaBuildScript:
             colored_print("Syncing Deps...", Colors.OKBLUE)
             subprocess.run(["python3", "tools/git-sync-deps"], check=True)
             patchCompilerArgs(self.compilerArgs)
-        else:
+        else :
             os.chdir(SKIA_SRC_DIR)
-            fetch_command = ["git", "fetch"]
-            if self.shallow_clone:
-                fetch_command.extend(["--depth", "1"])
-            fetch_command.extend(["origin", self.branch])
-            subprocess.run(fetch_command, check=True)
-            subprocess.run(["git", "checkout", self.branch], check=True)
-            subprocess.run(["git", "reset", "--hard", f"origin/{self.branch}"], check=True)
-            patchCompilerArgs(self.compilerArgs)
+            if not self.commandLineArgs.dirtyskia :
+                fetch_command = ["git", "fetch"]
+                if self.shallow_clone:
+                    fetch_command.extend(["--depth", "1"])
+                fetch_command.extend(["origin", self.branch])
+                subprocess.run(fetch_command, check=True)
+                subprocess.run(["git", "checkout", self.branch], check=True)
+                subprocess.run(["git", "reset", "--hard", f"origin/{self.branch}"], check=True)
+                patchCompilerArgs(self.compilerArgs)
+
 
         # patch here
         colored_print("Skia repository setup complete.", Colors.OKGREEN)
