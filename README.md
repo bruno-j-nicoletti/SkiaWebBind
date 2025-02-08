@@ -8,19 +8,32 @@ I have only built this on MacOS, but I expect it to work on any UNIX-alike. No i
 
 * First install the [emsdk](https://emscripten.org/docs/getting_started/downloads.html) and activated it as per instructions on the webpage.
 * have a working version of `make` installed
-* type `make`
+* issue the command `make`
     * this will take a very long time as it is downloading and compiling several thousand files files. This is quite dull.
 
 This should...
 * download skia source code into `thirdparty/skia`,
 * build skia and related libraries for web assembly
     * the results will be in the `build` directory
-        * libSkia.a
-* build libSkiaWebBind.a
-* build a simple example using the web bindings and skia
+        * `build/libskia.a`
+        * `build/libskottie.a`
+        * `build/libskparagraph.a`
+        * `build/libsksg.a`
+        * `build/libskshaper.a`
+        * `build/libskunicode_core.a`
+        * `build/libskunicode_icu.a`
+* build the web binding lib...
+    * `build/libSkiaWebBind.a`
+* build a simple example using the web bindings
+    * `build/example/logoExample.html`
+    * `build/example/logoExample.js`
+    * `build/example/logoExample.wasm`
 
 **!NOTE!**
 Skia will be built with the emsdk you activated, not the one it uses to build CanvasKit.
+
+**!NOTE!**
+The final link phase of the demo takes quite a while as -O3 has been passed to the linker. This substantially reduces the size of the generated webassembly. 
 
 ## Running the example
 Start a web server in your checkout, for example...
