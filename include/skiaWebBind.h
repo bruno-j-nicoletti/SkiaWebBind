@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Bruno Nicoletti
+ * Copyright 2024-2025 Bruno Nicoletti
  *
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
@@ -7,52 +7,38 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "include/core/SkSurface.h"
-#include <emscripten.h>
-#include <emscripten/bind.h>
 
+/// Namespace for Skia Web Bind
 namespace SWB {
-  namespace Impl {
-    emscripten::val& jsModule();
-
-    auto defineBindings() -> void;
-    struct Init : public emscripten::internal::InitFunc
-    {
-      Init()
-        : InitFunc(defineBindings) {};
-    };
-  } // namespace Impl
-
-  /// Draw the skia logo. Demo code.
-  auto drawSkiaLogo(SkCanvas* canvas) -> void;
-
   /// A surface bound to a canvas in a web browser
   class WebSurface {
   public:
-    WebSurface(const char* canvasID);
-    ~WebSurface();
+    virtual ~WebSurface();
 
-    auto surface() const -> SkSurface&
-    {
-      return *surface_;
-    }
-    auto makeCurrent() -> void;
-    auto flush() -> void;
+    /// Get the skia webgl surface, avoiding shared pointer atomic counting
+    virtual auto surface() const -> SkSurface& = 0;
 
-  protected:
-    emscripten::val surfaceJS_;
-    emscripten::val contextJS_;
-    sk_sp<SkSurface> surface_;
+    /// Get the surface pointer
+    virtual auto surfacePtr() const -> sk_sp<SkSurface> = 0;
 
-    /// What are we drawing on
-    enum class BackendEnum
-    {
-      eCPU,
-      eWebGL
-      // eWebGPU // oneday!
-    };
-    BackendEnum backend_;
+    /// Make the GL context of this surface current
+    virtual auto makeCurrent() -> bool = 0;
+
+    /// Flush all draw commands
+    virtual auto flush() -> void = 0;
   };
-} // namespace SWB
 
-#define SWB_INIT_BINDINGS static SWB::Impl::Init SWB_Init_instance;
+  /// Make a web surface
+  ///
+  /// If this fails for any reason, an empty shared pointer will be returned and
+  /// a message will be written to the console.
+  ///
+  /// This assumes there is no current GL context on the given canvas
+  ///
+  /// FIXME! : options!!!
+  auto makeWebSurface(const std::string& canvasID = "#canvas") -> std::shared_ptr<WebSurface>;
+} // namespace SWB

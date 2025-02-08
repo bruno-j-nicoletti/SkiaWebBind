@@ -5,29 +5,61 @@
  * found in the LICENSE file.
  */
 
-#include "emscripten/val.h"
 #include "skiaWebBind.h"
-#include <iostream>
+#include <emscripten/html5.h>
 
 #include "include/core/SkCanvas.h"
 
-extern "C"
+auto
+drawSkiaLogo(SkCanvas* canvas) -> void;
+
+std::shared_ptr<SWB::WebSurface> gWebSurface;
+
+auto
+cycleBackgroundColour() -> SkColor
 {
-  int main();
+  // background colour to cycle through
+  static std::array<float, 3> colour     = { 0.5f, 0.5f, 0.5f };
+  static std::array<float, 3> increments = { 0.002, 0.0013, 0.00053414 };
+
+  // cycle the background colour
+  for (int i = 0; i < 3; ++i) {
+    colour[i] = colour[i] + increments[i];
+    if (colour[i] > 1.0) {
+      increments[i] *= -1;
+      colour[i] = 1.0;
+    }
+    else if (colour[i] < 0.0) {
+      increments[i] *= -1;
+      colour[i] = 0.0;
+    }
+  }
+  return SkColor4f(colour[0], colour[1], colour[2], 1.0f).toSkColor();
+}
+
+auto
+draw() -> void
+{
+  if (gWebSurface->makeCurrent()) {
+    auto canvas = gWebSurface->surface().getCanvas();
+    canvas->clear(cycleBackgroundColour());
+    drawSkiaLogo(canvas);
+
+    gWebSurface->flush();
+  }
 }
 
 int
 main()
 {
-  SWB::WebSurface webSurface("canvasToDrawOn");
-  webSurface.makeCurrent();
+  static const char* kCanvasID = "#canvas";
 
-  SkCanvas* canvas         = webSurface.surface().getCanvas();
-  const SkColor background = SK_ColorWHITE;
-  canvas->clear(background);
+  emscripten_set_canvas_element_size(kCanvasID, 816, 464);
 
-  SWB::drawSkiaLogo(canvas);
-  webSurface.flush();
+  gWebSurface = SWB::makeWebSurface(kCanvasID);
 
+  if (gWebSurface) {
+    emscripten_set_main_loop(draw, 0, 1);
+  }
   return 0;
 }
