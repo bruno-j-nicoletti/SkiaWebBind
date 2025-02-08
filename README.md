@@ -3,6 +3,11 @@ A minimal library that allows a program written in C++ that uses the [skia](http
 
 Very much a work in progress at the moment and not ready to be used.
 
-## License
-
-Some of this code is based on the `CanvasKit` JS library, which is part of the Skia project. As such it copies some google code, this is indicated in several files and references the LICENSE.GOOGLE file.
+## TODO
+* parameterise creation of the web binding
+    * eg: attribs.powerPreference
+* how to handle HTML canvas resizing and any other canvas events
+* package up the JS side of it all
+* be able to build with exceptions enabled
+    * currently borks on linking with missing symbols if `-fwasm-exceptions` is enabled
+* call the whole skia build process from cmake
