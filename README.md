@@ -39,3 +39,4 @@ Browse into `build/example` and open `logoExample.html`. You should see a canvas
 * be able to build with exceptions enabled
     * currently borks on linking with missing symbols if `-fwasm-exceptions` is enabled
 * call the skia build process from cmake, not make
+* software mode fall back
