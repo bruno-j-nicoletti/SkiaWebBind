@@ -17,8 +17,9 @@ target_link_libraries(Example PRIVATE SkiaWebBind)
 
 target_link_options(Example
   PUBLIC
+  -Wl,--no-whole-archive
   ${SKIA_WEB_BIND_BINARY_DIR}/libskia.a
-  -g
+  -O3
   -sUSE_WEBGL2=1
   -sDYNAMIC_EXECUTION=1
   -sALLOW_MEMORY_GROWTH
