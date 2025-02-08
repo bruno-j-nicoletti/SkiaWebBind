@@ -9,44 +9,44 @@
 #include <emscripten/html5.h>
 
 #include "include/core/SkCanvas.h"
+
 auto
 drawSkiaLogo(SkCanvas* canvas) -> void;
 
-extern "C"
-{
-  int main();
-}
-
 std::shared_ptr<SWB::WebSurface> gWebSurface;
 
-void
-draw()
+auto
+cycleBackgroundColour() -> SkColor
 {
   // background colour to cycle through
-  static std::array<float, 3> colour           = { 0.5f, 0.5f, 0.5f };
+  static std::array<float, 3> colour     = { 0.5f, 0.5f, 0.5f };
   static std::array<float, 3> increments = { 0.002, 0.0013, 0.00053414 };
 
   // cycle the background colour
   for (int i = 0; i < 3; ++i) {
     colour[i] = colour[i] + increments[i];
     if (colour[i] > 1.0) {
-      increments[i]  *= -1;
+      increments[i] *= -1;
       colour[i] = 1.0;
     }
     else if (colour[i] < 0.0) {
-      increments[i]  *= -1;
+      increments[i] *= -1;
       colour[i] = 0.0;
     }
   }
+  return SkColor4f(colour[0], colour[1], colour[2], 1.0f).toSkColor();
+}
 
-  gWebSurface->makeCurrent();
-  auto canvas = gWebSurface->surface().getCanvas();
+auto
+draw() -> void
+{
+  if (gWebSurface->makeCurrent()) {
+    auto canvas = gWebSurface->surface().getCanvas();
+    canvas->clear(cycleBackgroundColour());
+    drawSkiaLogo(canvas);
 
-  const SkColor background = SkColor4f(colour[0], colour[1], colour[2], 1.0f).toSkColor();
-  canvas->clear(background);
-  drawSkiaLogo(canvas);
-
-  gWebSurface->flush();
+    gWebSurface->flush();
+  }
 }
 
 int
