@@ -56,3 +56,4 @@ In a web browser, got to `build/example` and open `logoExample.html`. You should
 * call the skia build process from cmake, not make
 * software mode fall back
 * more docs.
+* exceptions and RTTI don't work in this build, I need to hack `gn` some more so that you can enable them if you want.
