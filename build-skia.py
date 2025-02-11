@@ -3,14 +3,11 @@
 """
 build-skia.py
 
-This script automates the process of building Skia libraries for various platforms
-(macOS, iOS, and Windows). It handles the setup of the build environment, cloning
+This script automates the process of building Skia libraries for WASM
+It handles the setup of the build environment, cloning
 of the Skia repository, configuration of build parameters, and compilation of the
 libraries. The script also includes functionality for creating universal binaries
 for macOS and a Swift Package and XCFramework for iOS.
-
-Usage:
-    python3 build-skia.py <platform> [options]
 
 For detailed usage instructions, run:
     python3 build-skia.py --help
